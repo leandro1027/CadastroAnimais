@@ -7,11 +7,6 @@ import { UpdateAnimalDto } from './dto/update-animal.dto';
 export class AnimalController {
   constructor(private readonly animalService: AnimalService) {}
 
-  @Post()
-  create(@Body() createAnimalDto: CreateAnimalDto) {
-    return this.animalService.create(createAnimalDto);
-  }
-
   @Get()
   findAll() {
     return this.animalService.findAll();
@@ -20,6 +15,11 @@ export class AnimalController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.animalService.findOne(+id);
+  }
+
+  @Post()
+  create(@Body() createAnimalDto: CreateAnimalDto) {
+    return this.animalService.create(createAnimalDto);
   }
 
   @Patch(':id')
