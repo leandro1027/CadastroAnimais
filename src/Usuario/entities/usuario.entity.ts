@@ -3,4 +3,5 @@ export class usuario{
     nome: string
     cpf: string
     endereco: string
+    email: string
 }
