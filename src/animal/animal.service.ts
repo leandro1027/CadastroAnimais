@@ -18,7 +18,7 @@ export class AnimalService {
 
   update(id: number, updateAnimalDto: UpdateAnimalDto) {
     return `This action updates a #${id} animal`;
-  }
+  } 
 
   remove(id: number) {
     return `This action removes a #${id} animal`;
