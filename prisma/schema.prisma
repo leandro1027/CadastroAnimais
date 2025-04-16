@@ -12,3 +12,24 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Animal{
+  id Int @id  @default(autoincrement())
+  raca String
+  local String
+  doente Boolean
+  createdAt DateTime? @default(now())
+
+}
+
+model Usuario{
+  id Int @id  @default(autoincrement())
+  nome String
+  cpf String
+  email String
+  ja_adotou Boolean
+  createdAt DateTime? @default(now())
+
+}
+
+

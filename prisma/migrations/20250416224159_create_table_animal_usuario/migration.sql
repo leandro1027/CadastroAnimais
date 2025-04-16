@@ -1,0 +1,18 @@
+-- CreateTable
+CREATE TABLE "Animal" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "raca" TEXT NOT NULL,
+    "local" TEXT NOT NULL,
+    "doente" BOOLEAN NOT NULL,
+    "createdAt" DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "Usuario" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "nome" TEXT NOT NULL,
+    "cpf" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "ja_adotou" BOOLEAN NOT NULL,
+    "createdAt" DATETIME DEFAULT CURRENT_TIMESTAMP
+);

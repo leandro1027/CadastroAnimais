@@ -3,6 +3,7 @@ import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
 import { Animal } from './entities/animal.entity';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AnimalService {
@@ -18,6 +19,8 @@ export class AnimalService {
     }
     
   ]
+
+  constructor(private readonly prismaService: PrismaService){}
   
   findAll() {
     return this.animais

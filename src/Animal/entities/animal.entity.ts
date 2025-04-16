@@ -5,5 +5,6 @@ export class Animal {
     raca: string
     local: string
     doente: boolean
+    createdAT?: Date
 
 }
