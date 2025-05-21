@@ -7,17 +7,14 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 export class UsuarioService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async findAll() {
-    try {
-      return await this.prismaService.usuario.findMany({
-        include: {
-          animaisAdotados: true, 
-        },
-      });
-    } catch (error) {
-      throw new HttpException('Erro ao buscar usuários!', HttpStatus.BAD_REQUEST);
-    }
+  async findAll(pagination: { limit: number; offset: number }) {
+    const { limit, offset } = pagination;
+    return await this.prismaService.usuario.findMany({
+      skip: offset,
+      take: limit,
+    });
   }
+  
 
   async findOne(id: number) {
     const usuario = await this.prismaService.usuario.findUnique({
