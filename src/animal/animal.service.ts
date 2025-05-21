@@ -1,71 +1,101 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
-import { Animal } from './entities/animal.entity';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class AnimalService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  private animais: Animal[] = [
-    {
-        id: 1,
-        nome: "Animal 1",
-        raca: "Vira lata",
-        local: "Em frente a praça x",
-        doente: false
-       
-    }
-    
-  ]
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto
 
-  constructor(private readonly prismaService: PrismaService){}
-  
-  findAll() {
-    return this.animais
+    const animals = await this.prisma.animal.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        adotadoPor: true,
+      },
+    });
+
+    return animals;
   }
 
-  findOne(id: number) {
-    const animal = this.animais.find(animal => animal.id === id)
+  async findOne(id: number) {
+    const animal = await this.prisma.animal.findUnique({
+      where: { id },
+      include: {
+        adotadoPor: true,
+      },
+    });
 
-    if (animal) return animal
-    throw new HttpException("Esse animal não existe!", HttpStatus.NOT_FOUND)
+    if (!animal) {
+      throw new HttpException('Esse animal não existe!', HttpStatus.NOT_FOUND);
+    }
+
+    return animal;
   }
 
-  create(createAnimalDto: CreateAnimalDto) {
-    const newId = this.animais.length +1
+  async create(createAnimalDto: CreateAnimalDto) {
+    try {
+      const newAnimal = await this.prisma.animal.create({
+        data: {
+          raca: createAnimalDto.raca,
+          local: createAnimalDto.local,
+          doente: createAnimalDto.doente,
+          adotadoPorId: createAnimalDto.adotadoPorId || null,
+        },
+      });
 
-    const newAnimal = {
-      id: newId,
-      ...createAnimalDto
+      return newAnimal;
+    } catch (error) {
+      throw new HttpException('Erro ao cadastrar animal.', HttpStatus.BAD_REQUEST);
     }
   }
 
-  
-  update(id: number, updateAnimalDto: UpdateAnimalDto) {
-    const animalIndex = this.animais.findIndex(animal => animal.id === id)
+  async update(id: number, updateAnimalDto: UpdateAnimalDto) {
+    const existingAnimal = await this.prisma.animal.findUnique({ where: { id } });
 
-    if(animalIndex < 0)
-      throw new HttpException("Esse animal não existe!", HttpStatus.NOT_FOUND)
-
-    const animalItem = this.animais[animalIndex]
-
-    this.animais[animalIndex] ={
-      ...animalItem,
-      ...updateAnimalDto
+    if (!existingAnimal) {
+      throw new HttpException('Esse animal não existe!', HttpStatus.NOT_FOUND);
     }
-    return "Animal atualizado!"
-  } 
 
-  remove(id: number) {
-    const animalIndex = this.animais.findIndex(animal => animal.id === id)
+    try {
+      const updatedAnimal = await this.prisma.animal.update({
+        where: { id },
+        data: {
+          raca: updateAnimalDto.raca ?? existingAnimal.raca,
+          local: updateAnimalDto.local ?? existingAnimal.local,
+          doente: updateAnimalDto.doente ?? existingAnimal.doente,
+          adotadoPorId: updateAnimalDto.adotadoPorId ?? existingAnimal.adotadoPorId,
+        },
+      });
 
-    if(animalIndex < 0)
-        throw new HttpException("Esse animal não existe!", HttpStatus.NOT_FOUND)
+      return updatedAnimal;
+    } catch (error) {
+      throw new HttpException('Erro ao atualizar animal.', HttpStatus.BAD_REQUEST);
+    }
+  }
 
-    this.animais.splice(animalIndex, 1)
+  async remove(id: number) {
+    const existingAnimal = await this.prisma.animal.findUnique({ where: { id } });
 
-    return "Animal deletado!"
+    if (!existingAnimal) {
+      throw new HttpException('Esse animal não existe!', HttpStatus.NOT_FOUND);
+    }
+
+    try {
+      await this.prisma.animal.delete({
+        where: { id },
+      });
+
+      return 'Animal deletado com sucesso!';
+    } catch (error) {
+      throw new HttpException('Erro ao deletar animal.', HttpStatus.BAD_REQUEST);
+    }
   }
 }

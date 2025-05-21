@@ -1,15 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
 import { AnimalService } from './animal.service';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('animal')
 export class AnimalController {
   constructor(private readonly animalService: AnimalService) {}
 
   @Get()
-  findAll() {
-    return this.animalService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.animalService.findAll(paginationDto);
   }
 
   @Get(':id')
