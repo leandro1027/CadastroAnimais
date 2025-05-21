@@ -20,6 +20,9 @@ model Animal{
   doente Boolean
   createdAt DateTime? @default(now())
 
+  adotadoPorId Int?
+  adotadoPor   Usuario? @relation(fields: [adotadoPorId], references: [id])
+
 }
 
 model Usuario{
@@ -29,6 +32,8 @@ model Usuario{
   email String
   ja_adotou Boolean
   createdAt DateTime? @default(now())
+
+  animaisAdotados Animal[]
 
 }
 
